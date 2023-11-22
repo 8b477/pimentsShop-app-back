@@ -1,3 +1,10 @@
+using API_piment.Services.Token;
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -20,6 +27,29 @@ builder.Services.AddCors(options =>
         });
 });
 #endregion
+
+
+// Accéder à une variable d'environnement
+string secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
+
+//JWT DI
+builder.Services.AddSingleton<JWTService>();
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(options =>
+{
+
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey)),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+    };
+
+});
 
 
 var app = builder.Build();

@@ -13,11 +13,13 @@ namespace API_piment.Controllers
 
         #region DI
         private readonly SqlConnection? _conn = null;
+        private readonly Services.Token.JWTService? _jwtService = null;
         private readonly string str = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Db-piments;Integrated Security=True;";
 
-        public UserController()
+        public UserController(Services.Token.JWTService? jwtService)
         {
             _conn = new SqlConnection(str);
+            _jwtService = jwtService;
         }
         #endregion
 
@@ -85,7 +87,15 @@ namespace API_piment.Controllers
             Models.UserTokenDTO? result = _conn?.Query<Models.UserTokenDTO>(sql, new { pass = model.Password, mail = model.Email }).FirstOrDefault();
 
             if (result is not null)
-                return Ok(result);
+            {
+                string id = (result.Id).ToString();
+                string role = result.Role;
+
+                string token = _jwtService?.GenerateToken(id, role) ?? "";
+
+                if(!string.IsNullOrEmpty(token))
+                    return Ok(token);
+            }
 
             return BadRequest();
         }

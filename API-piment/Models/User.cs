@@ -42,4 +42,15 @@
         public string Name { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
     }
+
+
+
+    public record class UserAdminInfo
+    {
+        public int Id { get; }
+        public string Name { get; } = string.Empty;
+        public string Email { get; } = string.Empty;
+        public string Password { get; } = string.Empty;
+        public string Role { get; } = string.Empty;
+    }
 }
